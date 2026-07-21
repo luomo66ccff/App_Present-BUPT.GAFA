@@ -6,6 +6,7 @@ import { FragmentCard } from './FragmentCard';
 export struct NetworkView {
   @Prop @Watch('onFragmentsChanged') fragments: FragmentItem[] = [];
   @Prop @Watch('onRequestedIdChanged') requestedId: string = '';
+  @Prop @Watch('onRequestTokenChanged') requestToken: number = 0;
   @State private selectedId: string = '';
 
   aboutToAppear(): void {
@@ -17,6 +18,10 @@ export struct NetworkView {
   }
 
   private onRequestedIdChanged(): void {
+    this.selectRequestedFragment();
+  }
+
+  private onRequestTokenChanged(): void {
     this.selectRequestedFragment();
   }
 

@@ -43,7 +43,7 @@ export struct CaptureSheet {
     const values: string[] = this.tagText.split(',');
     values.forEach((value: string) => {
       const tag: string = value.trim();
-      if (tag.length > 0) {
+      if (tag.length > 0 && !result.includes(tag)) {
         result.push(tag);
       }
     });

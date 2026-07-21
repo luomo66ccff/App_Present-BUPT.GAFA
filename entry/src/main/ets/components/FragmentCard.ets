@@ -6,6 +6,17 @@ export struct FragmentCard {
   @Prop item: FragmentItem;
   onTap: (id: string) => void = () => {};
 
+  private visibleTags(): string[] {
+    const result: string[] = [];
+    this.item.tags.forEach((value: string) => {
+      const tag: string = value.trim();
+      if (tag.length > 0 && !result.includes(tag)) {
+        result.push(tag);
+      }
+    });
+    return result.slice(0, 3);
+  }
+
   build() {
     Column({ space: 12 }) {
       Row() {
@@ -34,7 +45,7 @@ export struct FragmentCard {
         .width('100%')
 
       Row({ space: 8 }) {
-        ForEach(this.item.tags.slice(0, 3), (tag: string) => {
+        ForEach(this.visibleTags(), (tag: string) => {
           Text(`#${tag}`)
             .fontSize(12)
             .fontColor('#716D7C')

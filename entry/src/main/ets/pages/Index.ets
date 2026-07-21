@@ -12,6 +12,7 @@ struct Index {
   @State private showCapture: boolean = false;
   @State private tabIndex: number = 0;
   @State private requestedNetworkId: string = '';
+  @State private networkRequestToken: number = 0;
 
   private reload(): void {
     this.fragments = FragmentRepository.list();
@@ -19,6 +20,7 @@ struct Index {
 
   private openNetwork(id: string): void {
     this.requestedNetworkId = id;
+    this.networkRequestToken += 1;
     this.tabIndex = 1;
   }
 
@@ -40,7 +42,8 @@ struct Index {
         TabContent() {
           NetworkView({
             fragments: this.fragments,
-            requestedId: this.requestedNetworkId
+            requestedId: this.requestedNetworkId,
+            requestToken: this.networkRequestToken
           })
         }
         .tabBar('延申')

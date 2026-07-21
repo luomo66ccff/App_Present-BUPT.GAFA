@@ -28,6 +28,17 @@ if defined NODE_HOME (
     set "NODE_EXE=%NODE_HOME%\node.exe"
     goto execute
   )
+  if exist "%NODE_HOME%\bin\node.exe" (
+    set "NODE_EXE=%NODE_HOME%\bin\node.exe"
+    goto execute
+  )
+)
+
+if defined LOCALAPPDATA (
+  if exist "%LOCALAPPDATA%\Huawei\DevEco Studio\tools\node\node.exe" (
+    set "NODE_EXE=%LOCALAPPDATA%\Huawei\DevEco Studio\tools\node\node.exe"
+    goto execute
+  )
 )
 
 if exist "%ProgramFiles%\Huawei\DevEco Studio\tools\node\node.exe" (
