@@ -4,12 +4,16 @@ import { FragmentCard } from './FragmentCard';
 
 @Component
 export struct NetworkView {
-  @Prop fragments: FragmentItem[] = [];
+  @Prop @Watch('onFragmentsChanged') fragments: FragmentItem[] = [];
   @Prop @Watch('onRequestedIdChanged') requestedId: string = '';
-  @State private selectedIndex: number = 0;
+  @State private selectedId: string = '';
 
   aboutToAppear(): void {
     this.selectRequestedFragment();
+  }
+
+  private onFragmentsChanged(): void {
+    this.ensureSelectedFragment();
   }
 
   private onRequestedIdChanged(): void {
@@ -17,17 +21,31 @@ export struct NetworkView {
   }
 
   private selectRequestedFragment(): void {
-    if (this.requestedId.length === 0) {
+    if (this.requestedId.length > 0 &&
+      this.fragments.some((item: FragmentItem) => item.id === this.requestedId)) {
+      this.selectedId = this.requestedId;
       return;
     }
-    const index: number = this.fragments.findIndex((item: FragmentItem) => item.id === this.requestedId);
-    if (index >= 0) {
-      this.selectedIndex = index;
+
+    this.ensureSelectedFragment();
+  }
+
+  private ensureSelectedFragment(): void {
+    if (this.fragments.length === 0) {
+      this.selectedId = '';
+      return;
+    }
+
+    if (!this.fragments.some((item: FragmentItem) => item.id === this.selectedId)) {
+      this.selectedId = this.fragments[0].id;
     }
   }
 
   private center(): FragmentItem {
-    return this.fragments[this.selectedIndex];
+    const selected: FragmentItem | undefined = this.fragments.find(
+      (item: FragmentItem) => item.id === this.selectedId
+    );
+    return selected ?? this.fragments[0];
   }
 
   private selfExtensions(): FragmentItem[] {
@@ -92,10 +110,10 @@ export struct NetworkView {
               ForEach(this.fragments, (item: FragmentItem, index: number) => {
                 Button(`${index + 1}`)
                   .fontSize(13)
-                  .fontColor(this.selectedIndex === index ? '#FFFFFF' : '#6F59D9')
-                  .backgroundColor(this.selectedIndex === index ? '#6F59D9' : '#F0ECFF')
+                  .fontColor(this.selectedId === item.id ? '#FFFFFF' : '#6F59D9')
+                  .backgroundColor(this.selectedId === item.id ? '#6F59D9' : '#F0ECFF')
                   .height(36)
-                  .onClick(() => this.selectedIndex = index)
+                  .onClick(() => this.selectedId = item.id)
               }, (item: FragmentItem) => item.id)
             }
           }
