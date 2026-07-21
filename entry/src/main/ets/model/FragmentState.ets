@@ -1,0 +1,6 @@
+export enum FragmentState {
+  SLEEPING = 'SLEEPING',
+  ECHOING = 'ECHOING',
+  CONNECTED = 'CONNECTED',
+  GROWING = 'GROWING'
+}
