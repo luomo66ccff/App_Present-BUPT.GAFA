@@ -1,0 +1,58 @@
+#!/usr/bin/env sh
+
+set -eu
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+WRAPPER_SCRIPT="$APP_HOME/hvigor/hvigor-wrapper.js"
+
+if [ ! -r "$WRAPPER_SCRIPT" ]; then
+  echo "ERROR: Cannot find $WRAPPER_SCRIPT" >&2
+  exit 1
+fi
+
+find_node() {
+  if [ -n "${DEVECO_STUDIO_HOME:-}" ]; then
+    for candidate in \
+      "$DEVECO_STUDIO_HOME/tools/node/bin/node" \
+      "$DEVECO_STUDIO_HOME/tools/node/node"; do
+      if [ -x "$candidate" ]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
+  fi
+
+  if [ -n "${DEVECO_HOME:-}" ]; then
+    for candidate in \
+      "$DEVECO_HOME/tools/node/bin/node" \
+      "$DEVECO_HOME/tools/node/node"; do
+      if [ -x "$candidate" ]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
+  fi
+
+  if [ -n "${NODE_HOME:-}" ]; then
+    for candidate in "$NODE_HOME/bin/node" "$NODE_HOME/node"; do
+      if [ -x "$candidate" ]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
+  fi
+
+  if command -v node >/dev/null 2>&1; then
+    command -v node
+    return 0
+  fi
+
+  return 1
+}
+
+if ! NODE_BIN=$(find_node); then
+  echo "ERROR: Node.js was not found. Set DEVECO_STUDIO_HOME or NODE_HOME, or add node to PATH." >&2
+  exit 1
+fi
+
+exec "$NODE_BIN" "$WRAPPER_SCRIPT" "$@"

@@ -43,4 +43,20 @@ entry/src/main/ets/
 3. 配置本机签名；
 4. 选择 phone、tablet 或 2in1 模拟器运行 `entry` 模块。
 
+## 命令行构建
+
+仓库包含 Windows 与 macOS/Linux 的 Hvigor 启动脚本。运行前需安装 DevEco Studio 或 HarmonyOS 命令行工具，并配置 HarmonyOS SDK。
+
+```powershell
+# Windows
+.\hvigorw.bat clean --mode module -p product=default assembleHap
+```
+
+```bash
+# macOS / Linux
+./hvigorw clean --mode module -p product=default assembleHap
+```
+
+脚本会优先使用 DevEco Studio 自带的 Hvigor。非默认安装位置可设置 `DEVECO_STUDIO_HOME`，或通过 `HVIGORW_JS` 直接指定 `tools/hvigor/bin/hvigorw.js` 的绝对路径。
+
 > 当前版本聚焦产品骨架。ArkData 持久化、系统卡片、通知调度、端侧语义关联和真实社区服务将在后续迭代接入。
