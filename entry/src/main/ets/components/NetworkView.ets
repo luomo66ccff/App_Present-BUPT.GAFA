@@ -5,10 +5,14 @@ import { FragmentCard } from './FragmentCard';
 @Component
 export struct NetworkView {
   @Prop fragments: FragmentItem[] = [];
-  @Prop requestedId: string = '';
+  @Prop @Watch('onRequestedIdChanged') requestedId: string = '';
   @State private selectedIndex: number = 0;
 
   aboutToAppear(): void {
+    this.selectRequestedFragment();
+  }
+
+  private onRequestedIdChanged(): void {
     this.selectRequestedFragment();
   }
 
