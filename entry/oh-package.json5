@@ -1,9 +1,9 @@
-﻿{
+{
   "name": "entry",
   "version": "1.0.0",
-  "description": "Fragment Box entry module",
+  "description": "Fragment entry module",
   "main": "",
-  "author": "",
+  "author": "BUPT-GAFA",
   "license": "Apache-2.0",
   "dependencies": {}
 }
