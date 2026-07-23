@@ -1,0 +1,17 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "碎片 Box"
+    },
+    {
+      "name": "module_desc",
+      "value": "Fragment Box ArkUI Demo"
+    },
+    {
+      "name": "entryability_desc",
+      "value": "Entry ability"
+    }
+  ]
+}
+

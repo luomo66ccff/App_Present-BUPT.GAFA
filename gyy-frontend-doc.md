@@ -1,5 +1,22 @@
 # 碎片 Box (FragmentBox) — 前端说明文档
 
+## 快速开始（队友克隆后即可预览）
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/williamcarlo/App_Frangment-BUPT.GAFA.git
+
+# 2. 用 DevEco Studio 打开项目
+#    File → Open → 选择克隆下来的 App_Frangment-BUPT.GAFA 文件夹
+#    DevEco Studio 会自动识别为 HarmonyOS Stage 模型工程
+
+# 3. 预览运行
+#    点击右上角 Previewer 即可在模拟器中查看完整前端效果
+#    或连接真机/模拟器运行 HAP
+```
+
+> **核心代码位置**：`entry/src/main/ets/pages/Index.ets`（全部页面逻辑在一个文件中）
+
 ## 1. 项目概述
 
 **碎片 Box** 是一个基于 HarmonyOS ArkUI 的移动端应用 Demo，围绕"想法碎片化管理"这一核心概念，提供三个维度的交互体验：

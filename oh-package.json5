@@ -1,0 +1,10 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "fragment-box-arkui-demo",
+  "version": "1.0.0",
+  "description": "ArkUI demo for fragment thought extension app",
+  "main": "",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}
