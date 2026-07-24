@@ -140,6 +140,7 @@ struct Index {
   @State draftContent: string = ''
   @State draftTag: string = ''
   @State draftRemind: string = '通勤'
+  @State fragmentSearchQuery: string = ''
   @State shareEnabled: boolean = true
   @State shareChoiceMade: boolean = false
   @State inputErrorText: string = ''
@@ -327,6 +328,18 @@ struct Index {
     return this.activeIndex
   }
 
+  private filteredFragments(): FragmentItem[] {
+    let keyword: string = this.fragmentSearchQuery.trim().toLowerCase()
+    if (keyword.length === 0) {
+      return this.fragments
+    }
+    return this.fragments.filter((item: FragmentItem) => {
+      return item.id.toLowerCase().indexOf(keyword) >= 0 ||
+        item.tag.toLowerCase().indexOf(keyword) >= 0 ||
+        item.text.toLowerCase().indexOf(keyword) >= 0
+    })
+  }
+
   private openInputSheet(): void {
     this.inputErrorText = ''
     this.showInputSheet = true
@@ -338,18 +351,25 @@ struct Index {
   }
 
   private archiveFragment(): void {
+    let content: string = this.draftContent.trim()
+    if (content.length === 0) {
+      this.inputErrorText = '请先写下碎片内容'
+      this.showNotice('碎片内容不能为空')
+      return
+    }
+    if (content.length > 500) {
+      this.inputErrorText = '一张碎片最多 500 字'
+      this.showNotice('内容太长，可以拆成两张碎片')
+      return
+    }
     if (!this.shareChoiceMade) {
       this.inputErrorText = '请先选择共享范围'
       this.showNotice('请选择是否分享到社区')
       return
     }
 
-    let content: string = this.draftContent.trim()
     let tag: string = this.draftTag.trim()
     let archivedShared: boolean = this.shareEnabled
-    if (content.length === 0) {
-      content = '一个还没确定价值的碎片已放入 Box，等待未来重新出现。'
-    }
     if (tag.length === 0) {
       tag = '未命名碎片'
     }
@@ -454,6 +474,41 @@ struct Index {
       new CommunityNode(parentKey + '-a' + base.toString(), parentKey, '相似分支', parent.tag, '匿名共享', 'AI 匹配：相似经验', '换一个生活场景看，问题也许不是社交本身，而是节奏被打断。', 'slate', 0, 0, 0, 0),
       new CommunityNode(parentKey + '-b' + base.toString(), parentKey, '反向视角', parent.tag, 'BOXer', 'AI 匹配：相反经验', '它也许不该被马上解决，只是需要被另一种方式看见。', 'rose', 0, 0, 0, 0)
     ]
+  }
+
+  private saveActiveCommunityFragment(): void {
+    if (this.activeCommunityKey === 'root') {
+      this.showNotice('这张碎片已经在你的 Box 里')
+      return
+    }
+
+    let node: CommunityNode = this.getCommunityNode(this.activeCommunityKey)
+    let item: FragmentItem = new FragmentItem(
+      this.nextFragmentId(),
+      node.tag,
+      node.text,
+      node.tone,
+      '周末',
+      false,
+      '今天'
+    )
+    this.fragments = this.fragments.concat([item])
+    this.activeIndex = this.fragments.length - 1
+    this.showNotice('已收进 Box · 仅自己可见')
+  }
+
+  private continueFromActiveCommunityFragment(): void {
+    let tag: string = this.currentFragment().tag
+    if (this.activeCommunityKey !== 'root') {
+      tag = this.getCommunityNode(this.activeCommunityKey).tag
+    }
+    this.draftContent = ''
+    this.draftTag = tag
+    this.draftRemind = '周末'
+    this.shareEnabled = true
+    this.shareChoiceMade = false
+    this.inputErrorText = ''
+    this.showInputSheet = true
   }
 
   private treeNodeWidth(depth: number, count: number): number {
@@ -931,6 +986,24 @@ struct Index {
     Column() {
       this.WaterfallHeader()
 
+      TextInput({
+        text: this.fragmentSearchQuery,
+        placeholder: '搜索关键词、Tag 或碎片编号'
+      })
+        .width('100%')
+        .height(44)
+        .fontSize(14)
+        .fontColor(BoxStyle.TEXT)
+        .placeholderColor(BoxStyle.TEXT_MUTED)
+        .backgroundColor('rgba(255, 255, 255, 0.68)')
+        .border({ width: 1, color: BoxStyle.HAIRLINE })
+        .borderRadius(20)
+        .padding({ left: 16, right: 16 })
+        .margin({ bottom: 10 })
+        .onChange((value: string) => {
+          this.fragmentSearchQuery = value
+        })
+
       List({ space: 8 }) {
         ListItem() {
           Column() {
@@ -940,11 +1013,22 @@ struct Index {
           .width('100%')
         }
 
-        ForEach(this.fragments, (item: FragmentItem) => {
+        if (this.filteredFragments().length === 0) {
           ListItem() {
-            this.FragmentWaterfallItem(item)
+            Text('没有找到对应碎片，换一个关键词试试。')
+              .width('100%')
+              .height(120)
+              .fontSize(14)
+              .fontColor(BoxStyle.TEXT_MUTED)
+              .textAlign(TextAlign.Center)
           }
-        }, (item: FragmentItem) => item.id)
+        } else {
+          ForEach(this.filteredFragments(), (item: FragmentItem) => {
+            ListItem() {
+              this.FragmentWaterfallItem(item)
+            }
+          }, (item: FragmentItem) => item.id)
+        }
 
         ListItem() {
           Column() {
@@ -958,7 +1042,9 @@ struct Index {
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .onScrollIndex((firstIndex: number, lastIndex: number, centerIndex?: number) => {
-        this.activeIndex = this.waterfallActiveIndex(firstIndex, lastIndex, centerIndex)
+        if (this.fragmentSearchQuery.trim().length === 0) {
+          this.activeIndex = this.waterfallActiveIndex(firstIndex, lastIndex, centerIndex)
+        }
       })
 
       Row() {
@@ -1446,7 +1532,7 @@ struct Index {
           .backgroundColor('#383B38')
           .borderRadius(18)
           .onClick(() => {
-            this.showNotice('已收进 Box')
+            this.saveActiveCommunityFragment()
           })
 
         Button('继续延伸')
@@ -1459,8 +1545,7 @@ struct Index {
           .border({ width: 1, color: BoxStyle.HAIRLINE })
           .borderRadius(18)
           .onClick(() => {
-            this.selectCommunityNode(this.activeCommunityKey)
-            this.showNotice('已生成新的延伸分支')
+            this.continueFromActiveCommunityFragment()
           })
       }
       .width('100%')
